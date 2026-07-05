@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>J.A.R.V.I.S. // Supabase Cloud Monolith v170.0</title>
+    <title>J.A.R.V.I.S. // Supabase Cloud Monolith v200.0</title>
     <!-- Official Supabase JS v2 SDK CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -176,7 +176,6 @@
 
         .brand-text { font-size: clamp(13px, 1.3vw, 15px); letter-spacing: 3px; font-weight: 800; }
 
-        /* Supabase Cloud Beacon */
         .supabase-beacon {
             background: rgba(10, 10, 14, 0.85);
             border: 1px solid rgba(0, 255, 150, 0.4);
@@ -235,7 +234,7 @@
             padding: 18px;
             max-height: clamp(180px, 28vh, 260px);
             overflow-y: auto;
-            display: none;
+            display: flex;
             flex-direction: column;
             gap: 10px;
             box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95);
@@ -251,6 +250,19 @@
         .msg.jarvis { align-self: flex-start; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); color: #e0e0e0; }
         .msg.killcritic { align-self: flex-start; background: rgba(255, 255, 255, 0.09); border: 1px solid #ffffff; color: #ffffff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
         .msg.killcritic::before { content: "[ KILL-CRITIC AUDIT VERDICT ]"; display: block; font-size: 9px; font-family: var(--font-mono); font-weight: 800; margin-bottom: 6px; letter-spacing: 1.5px; color: #ffffff; }
+
+        .msg.thinking-block {
+            align-self: flex-start;
+            background: #020203;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #88a0b8;
+            line-height: 1.6;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
+        }
 
         .voice-pod {
             display: flex;
@@ -292,13 +304,14 @@
         .pod-mic-btn.listening { background: #ff2a2a; color: #ffffff; animation: pulse-mic 1s infinite; }
         @keyframes pulse-mic { 0%, 100% { box-shadow: 0 0 15px rgba(255, 42, 42, 0.5); } 50% { box-shadow: 0 0 35px rgba(255, 42, 42, 0.9); } }
 
+        /* MANUAL INPUT DIV BLOCK (PREVENTS RELOADS) */
         .manual-input-bar {
             width: 100%;
-            display: none;
+            display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(14, 14, 16, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(14, 14, 16, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.32);
             backdrop-filter: blur(40px);
             padding: 8px;
             border-radius: 20px;
@@ -309,6 +322,7 @@
         .btn-send {
             padding: 0 18px; height: 36px; border-radius: 14px; background: #ffffff; color: #000000; border: none; font-weight: 700; font-size: 11px; cursor: pointer; transition: all var(--spring); display: flex; align-items: center; justify-content: center;
         }
+        .btn-send:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
 
         /* EXACT CHATGPT SIDEBAR DRAWER */
         #sidebar-drawer {
@@ -404,7 +418,6 @@
             </div>
 
             <div class="nav-right">
-                <!-- LIVE SUPABASE CLOUD TELEMETRY BEACON -->
                 <div class="supabase-beacon" id="cloud-beacon">
                     <div style="width:6px;height:6px;border-radius:50%;background:#00ff96;box-shadow:0 0 8px #00ff96;"></div>
                     <span>SUPABASE CLOUD: poqpb... ONLINE</span>
@@ -423,18 +436,19 @@
 
         <footer class="bottom-deck">
             <div class="chat-container" id="chat-modal-deck">
-                <div class="msg jarvis">Supreme Voice Layer active over Gemini & Claude. Supabase Cloud DB connected. State your directive or speak aloud.</div>
+                <div class="msg jarvis">Supreme Voice Layer active over Gemini & Claude. Enter key input submission verified. State your directive or speak aloud.</div>
             </div>
 
-            <form class="manual-input-bar" id="manual-input-form" onsubmit="submitQuery(event)">
+            <!-- MANUAL INPUT DIV BLOCK (PREVENTS RELOADS) -->
+            <div class="manual-input-bar" id="manual-input-form">
                 <input type="text" id="user-input" class="spotlight-input" placeholder="Transmit instruction or command..." autocomplete="off" onkeydown="handleKeyDown(event)">
-                <button type="submit" class="btn-send">
+                <button type="button" class="btn-send" onclick="submitQuery(event)">
                     <svg class="svg-vector" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
-            </form>
+            </div>
             
             <div class="voice-pod">
-                <button class="pod-side-btn" id="btn-toggle-chat" onclick="toggleChatDeck()" title="Toggle text chat interface">
+                <button class="pod-side-btn active" id="btn-toggle-chat" onclick="toggleChatDeck()" title="Toggle text chat interface">
                     <svg class="svg-vector" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </button>
 
@@ -531,7 +545,6 @@
         <div class="drawer-card">
             <h2>STARK CONTROL CENTER</h2>
 
-            <!-- SUPABASE CLOUD SYNC & TEST ENGINE -->
             <div class="sec-title">Supabase Cloud Database Controller</div>
             <div class="sim-grid" style="margin-bottom: 12px;">
                 <button class="btn-sim" onclick="syncSupabaseProfile()">
@@ -566,7 +579,7 @@
 
     <script>
         /* =========================================================================
-           SUPABASE CLOUD CLIENT & FERROFLUID ORCHESTRATION
+           SUPABASE CLOUD CLIENT & GUARANTEED CHAT DISPATCH CONTROLLER
         ========================================================================= */
         const SUPABASE_URL = "https://poqpbhxeaotiebrekcah.supabase.co";
         const SUPABASE_KEY = "sb_publishable_GVcGf8fzwkiUKFRVc9xSAw_TROQ2J_N";
@@ -596,8 +609,6 @@
                     addMsg('jarvis', `[SUPABASE CLOUD NOTICE] Live table write checked. Buffered profile credentials to local matrix.`);
                     speakVoice("Profile synchronized.");
                 }
-            } else {
-                addMsg('jarvis', `[SUPABASE CLOUD NOTICE] Client initialized. Credentials verified.`);
             }
         }
 
@@ -620,7 +631,7 @@
         let pulseAmp = 0, zoom = 1.0, targetZoom = 1.0;
         let recognition = null, isSpeaking = false, watchdogTimer = null, speechSafetyTimer = null;
         let clonedAudioBuffer = null, ukVoiceProfile = null;
-        let isChatOpen = false;
+        let isChatOpen = true; // OUT OF BOX VISIBLE
 
         function toggleChatDeck() {
             playSFX('switch');
@@ -663,6 +674,7 @@
         function startNewSession() {
             playSFX('switch'); closeSidebar();
             isIncognito = false;
+            if (!isChatOpen) toggleChatDeck();
             document.getElementById('msg-deck').innerHTML = `<div class="msg jarvis">New executive session initialized. State your objective, Sir.</div>`;
         }
 
@@ -678,7 +690,7 @@
             playSFX('switch'); closeAllModals();
             if (!isChatOpen) toggleChatDeck();
             addMsg('user', `Load archive: "${title}"`);
-            processAI(`Archive synchronized: ${title}. Parameters active.`);
+            runDeepThinkingSequence(`Archive synchronized: ${title}. Parameters active.`, `Archive loaded: ${title}. All historical parameters and quantum checkpoints synchronized.`);
         }
 
         function findUKVoice() {
@@ -745,7 +757,7 @@
             wakeActive = !wakeActive;
             const txt = document.getElementById('txt-wakeword');
             if (wakeActive) {
-                txt.innerText = 'WAKE-WORD: SAY "WAKE UP JARVIS"';
+                txt.innerText = 'WAKE-WORD ACTIVE: SAY "WAKE UP JARVIS"';
                 startContinuousWatchdog(); playSFX('switch');
             } else {
                 txt.innerText = 'WAKE-WORD PAUSED';
@@ -778,67 +790,90 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function handleKeyDown(e) { if (e.key === 'Enter') { e.preventDefault(); submitQuery(); } }
+        function handleKeyDown(e) {
+            if (e.key === 'Enter') {
+                submitQuery(e);
+            }
+        }
 
         function submitQuery(e) {
             if (e) e.preventDefault();
             const inp = document.getElementById('user-input');
             const text = inp.value.trim(); if (!text) return;
             playSFX('click'); if (!isChatOpen) toggleChatDeck(); addMsg('user', text); inp.value = '';
-            processAI(text);
+            runDeepThinkingSequence(text, getAIAnswer(text));
         }
 
         function handleMic() {
             playSFX('click');
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SR) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); return; }
+            if (!SR) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); return; }
             try {
                 const r = new SR();
                 r.onstart = () => document.getElementById('btn-mic').classList.add('listening');
                 r.onresult = (e) => {
                     const tr = e.results[0][0].transcript; if (!isChatOpen) toggleChatDeck(); addMsg('user', tr);
-                    processAI(tr);
+                    runDeepThinkingSequence(tr, getAIAnswer(tr));
                 };
-                r.onerror = () => { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); };
+                r.onerror = () => { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); };
                 r.onend = () => document.getElementById('btn-mic').classList.remove('listening');
                 r.start();
-            } catch(err) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); }
+            } catch(err) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); }
         }
 
-        async function processAI(rawInput) {
-            pulseAmp = 40;
+        function addMsg(sender, text) {
+            const b = document.getElementById('chat-modal-deck'), d = document.createElement('div');
+            d.className = `msg ${sender}`; d.innerText = text; b.appendChild(d); b.scrollTop = b.scrollHeight;
+        }
+
+        /* --- 6-STAGE DEEP COGNITIVE TERMINAL STREAM --- */
+        function runDeepThinkingSequence(promptSummary, finalAnswer) {
+            pulseAmp = 45;
+            const b = document.getElementById('chat-modal-deck');
+            const thinkingCard = document.createElement('div');
+            thinkingCard.className = 'msg thinking-block';
+            b.appendChild(thinkingCard);
+            b.scrollTop = b.scrollHeight;
+
+            const steps = [
+                "[SYS] Initializing multi-modal core...",
+                "[MEM] Accessing vector database...",
+                "[NET] Establishing secure latency link...",
+                "[VIS] Parsing spatial awareness layers...",
+                "[INT] Calculating contextual probability...",
+                "[OPT] Optimizing response for terminal output..."
+            ];
+
+            let stepIdx = 0;
+            const streamInt = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    thinkingCard.innerHTML += (stepIdx > 0 ? "<br>" : "") + steps[stepIdx];
+                    b.scrollTop = b.scrollHeight;
+                    playSFX('click');
+                    stepIdx++;
+                } else {
+                    clearInterval(streamInt);
+                    setTimeout(() => {
+                        thinkingCard.remove();
+                        addMsg(activeMode === 'killcritic' ? 'killcritic' : 'jarvis', finalAnswer);
+                        speakVoice(finalAnswer);
+                        if (supabaseClient && !isIncognito) {
+                            try { supabaseClient.from('conversation_messages').insert([{ sender_type: activeMode === 'killcritic' ? 'killcritic' : 'jarvis', message_text: finalAnswer }]); } catch(e){}
+                        }
+                    }, 300);
+                }
+            }, 200);
+        }
+
+        function getAIAnswer(rawInput) {
             const q = rawInput.trim(), lower = q.toLowerCase();
-            let res = "";
-
-            if (activeMode === 'killcritic') {
-                res = `VERDICT: Premise unchecked. Risk of concurrency bottleneck. Action: Enforce strict token-bucket rate limiting immediately.`;
-            } else if (lower.includes('status') || lower.includes('report') || lower.includes('how are you')) {
-                res = `Supreme Voice Layer nominal at 60 FPS. Routing across Gemini and Claude matrices active. Ready.`;
-            } else if (lower.includes('time') || lower.includes('date')) {
-                res = `Current system time is ${new Date().toLocaleTimeString()}, Sir.`;
-            } else if (lower.includes('+') || lower.includes('-') || lower.includes('*') || lower.includes('/') || lower.includes('%')) {
-                try {
-                    let mathStr = lower.replace(/what is|calculate|of/g, '').replace(/%/g, '* 0.01').replace(/x/g, '*').trim();
-                    res = `${eval(mathStr)}, Sir.`;
-                } catch(e) { res = `Numerical syntax invalid. Specify exact arithmetic formula.`; }
-            } else if (lower.includes('code') || lower.includes('bug')) {
-                res = `Diagnosis: Memory leak or unhandled null reference. Enforce strict type boundaries.`;
-            } else {
-                res = `Command routed via ${activeMode.toUpperCase()}: "${q}". Execution confirmed.`;
+            if (activeMode === 'killcritic') return `VERDICT: Premise unchecked. Risk of concurrency bottleneck. Action: Enforce strict token-bucket rate limiting immediately.`;
+            if (lower.includes('status') || lower.includes('report') || lower.includes('how are you')) return `Supreme Voice Layer nominal at 60 FPS. Routing across Gemini and Claude matrices active. Ready.`;
+            if (lower.includes('time') || lower.includes('date')) return `Current system time is ${new Date().toLocaleTimeString()}, Sir.`;
+            if (lower.includes('+') || lower.includes('-') || lower.includes('*')) {
+                try { return `${eval(lower.replace(/what is|calculate/g,'').trim())}, Sir.`; } catch(e) { return `Syntax invalid.`; }
             }
-
-            if (isChatOpen) addMsg(activeMode === 'killcritic' ? 'killcritic' : 'jarvis', res);
-            speakVoice(res);
-
-            // Asynchronously log interaction to live Supabase Cloud database!
-            if (supabaseClient && !isIncognito) {
-                try {
-                    await supabaseClient.from('conversation_messages').insert([{
-                        sender_type: activeMode === 'killcritic' ? 'killcritic' : 'jarvis',
-                        message_text: res
-                    }]);
-                } catch(e) {}
-            }
+            return `Command routed via ${activeMode.toUpperCase()}: "${q}". Execution confirmed.`;
         }
 
         let canvas, ctx, points = [], angleX = 0.3, angleY = 0, isDragging = false, lastX = 0, lastY = 0;
@@ -932,7 +967,7 @@
                     let c = tr.replace(/^(wake up jarvis|hey jarvis|jarvis)[\s,\.]*/i, '').trim() || "Status report.";
                     if (!isChatOpen) toggleChatDeck();
                     addMsg('user', `[WAKE-WORD DETECTED] ${c}`);
-                    processAI(c);
+                    runDeepThinkingSequence(c, getAIAnswer(c));
                 }
             };
 
