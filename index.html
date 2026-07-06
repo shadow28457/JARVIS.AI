@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>J.A.R.V.I.S. // Supabase Cloud Monolith v200.0</title>
-    <!-- Official Supabase JS v2 SDK CDN -->
+    <title>J.A.R.V.I.S. // 1000/10 Spatial Monolith v250.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -225,6 +224,22 @@
             gap: 14px;
         }
 
+        .incognito-badge {
+            background: rgba(255, 42, 42, 0.15);
+            border: 1px solid #ff2a2a;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 42, 42, 0.4);
+            display: none;
+            animation: pulse-incognito 2s infinite;
+        }
+        @keyframes pulse-incognito { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; box-shadow: 0 0 35px rgba(255, 42, 42, 0.8); } }
+
         #chat-modal-deck {
             width: 100%;
             background: rgba(10, 10, 12, 0.94);
@@ -250,19 +265,6 @@
         .msg.jarvis { align-self: flex-start; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); color: #e0e0e0; }
         .msg.killcritic { align-self: flex-start; background: rgba(255, 255, 255, 0.09); border: 1px solid #ffffff; color: #ffffff; box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
         .msg.killcritic::before { content: "[ KILL-CRITIC AUDIT VERDICT ]"; display: block; font-size: 9px; font-family: var(--font-mono); font-weight: 800; margin-bottom: 6px; letter-spacing: 1.5px; color: #ffffff; }
-
-        .msg.thinking-block {
-            align-self: flex-start;
-            background: #020203;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 14px;
-            padding: 12px 14px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: #88a0b8;
-            line-height: 1.6;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
-        }
 
         .voice-pod {
             display: flex;
@@ -304,10 +306,9 @@
         .pod-mic-btn.listening { background: #ff2a2a; color: #ffffff; animation: pulse-mic 1s infinite; }
         @keyframes pulse-mic { 0%, 100% { box-shadow: 0 0 15px rgba(255, 42, 42, 0.5); } 50% { box-shadow: 0 0 35px rgba(255, 42, 42, 0.9); } }
 
-        /* MANUAL INPUT DIV BLOCK (PREVENTS RELOADS) */
         .manual-input-bar {
             width: 100%;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 8px;
             background: rgba(14, 14, 16, 0.94);
@@ -322,7 +323,6 @@
         .btn-send {
             padding: 0 18px; height: 36px; border-radius: 14px; background: #ffffff; color: #000000; border: none; font-weight: 700; font-size: 11px; cursor: pointer; transition: all var(--spring); display: flex; align-items: center; justify-content: center;
         }
-        .btn-send:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
 
         /* EXACT CHATGPT SIDEBAR DRAWER */
         #sidebar-drawer {
@@ -381,6 +381,9 @@
         .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .btn-sim { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff; padding: 12px; border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-sim:hover { background: #ffffff; color: #000000; }
+        .form-row { margin-bottom: 12px; }
+        .form-row label { display: block; font-size: 10px; color: #888888; margin-bottom: 6px; }
+        .form-row input { width: 100%; padding: 10px 14px; background: rgba(0, 0, 0, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: #ffffff; font-family: var(--font-mono); font-size: 11px; }
 
         @media (max-width: 768px) {
             #hud-main { padding: 14px; }
@@ -429,17 +432,20 @@
                 </div>
 
                 <button class="btn-icon" onclick="openSettings()" title="Open Control Center">
-                    <svg class="svg-vector" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <svg class="svg-vector" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 </button>
             </div>
         </header>
 
         <footer class="bottom-deck">
-            <div class="chat-container" id="chat-modal-deck">
-                <div class="msg jarvis">Supreme Voice Layer active over Gemini & Claude. Enter key input submission verified. State your directive or speak aloud.</div>
+            <div class="incognito-badge" id="incognito-badge">
+                [ 👻 TEMPORARY INCOGNITO WINDOW: ZERO STATE ARCHIVED TO DATABASE ]
             </div>
 
-            <!-- MANUAL INPUT DIV BLOCK (PREVENTS RELOADS) -->
+            <div class="chat-container" id="chat-modal-deck">
+                <div class="msg jarvis" id="welcome-msg">Supreme Voice Layer active over Gemini & Claude. Every turn queries AI matrix. State your directive.</div>
+            </div>
+
             <div class="manual-input-bar" id="manual-input-form">
                 <input type="text" id="user-input" class="spotlight-input" placeholder="Transmit instruction or command..." autocomplete="off" onkeydown="handleKeyDown(event)">
                 <button type="button" class="btn-send" onclick="submitQuery(event)">
@@ -483,7 +489,7 @@
                     <span style="font-size: 14px; color: #888;">+</span>
                 </button>
 
-                <button class="sb-btn-temp" onclick="startTemporaryChat()">
+                <button class="sb-btn-temp" onclick="openTemporaryIncognitoWindow()">
                     <svg class="svg-vector" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                     <span>Temporary chat</span>
                 </button>
@@ -557,6 +563,10 @@
                 </button>
             </div>
 
+            <div class="sec-title">API Key Vault (Mandatory Live AI Routing)</div>
+            <div class="form-row"><label>Gemini API Key</label><input type="password" id="val-gemini" placeholder="AIzaSy..."></div>
+            <div class="form-row"><label>Claude API Key</label><input type="password" id="val-claude" placeholder="sk-ant-..."></div>
+
             <div class="sec-title">AI Voice Sample Upload (Formant Resonance Vocoder)</div>
             <input type="file" id="mp3-input" accept="audio/mp3,audio/wav,audio/*" style="display: none;" onchange="handleVoiceUpload(event)">
             <div class="voice-upload-box" onclick="document.getElementById('mp3-input').click()">
@@ -590,6 +600,20 @@
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch(e) {}
+
+        let audioCtx = null, activeMode = 'reflex', wakeActive = true, isIncognito = false;
+        let pulseAmp = 0, zoom = 1.0, targetZoom = 1.0;
+        let recognition = null, isSpeaking = false, watchdogTimer = null, speechSafetyTimer = null;
+        let clonedAudioBuffer = null, ukVoiceProfile = null;
+        let isChatOpen = true;
+
+        if (window.location.search.includes('incognito=true')) {
+            isIncognito = true;
+            window.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('incognito-badge').style.display = 'block';
+                document.getElementById('welcome-msg').innerText = "[ VOLATILE INCOGNITO WINDOW ] Zero conversation memory or vector embeddings will be archived to Supabase Cloud.";
+            });
+        }
 
         async function syncSupabaseProfile() {
             playSFX('switch'); closeSettings(); if (!isChatOpen) toggleChatDeck();
@@ -626,12 +650,6 @@
                 }
             }
         }
-
-        let audioCtx = null, activeMode = 'reflex', wakeActive = true, isIncognito = false;
-        let pulseAmp = 0, zoom = 1.0, targetZoom = 1.0;
-        let recognition = null, isSpeaking = false, watchdogTimer = null, speechSafetyTimer = null;
-        let clonedAudioBuffer = null, ukVoiceProfile = null;
-        let isChatOpen = true; // OUT OF BOX VISIBLE
 
         function toggleChatDeck() {
             playSFX('switch');
@@ -675,22 +693,19 @@
             playSFX('switch'); closeSidebar();
             isIncognito = false;
             if (!isChatOpen) toggleChatDeck();
-            document.getElementById('msg-deck').innerHTML = `<div class="msg jarvis">New executive session initialized. State your objective, Sir.</div>`;
+            document.getElementById('chat-modal-deck').innerHTML = '';
         }
 
-        function startTemporaryChat() {
+        function openTemporaryIncognitoWindow() {
             playSFX('switch'); closeSidebar();
-            isIncognito = true;
-            if (!isChatOpen) toggleChatDeck();
-            document.getElementById('msg-deck').innerHTML = `<div class="msg jarvis" style="border-color:#ff5555;">[ INCOGNITO MODE ] Temporary chat active. Zero conversation memory or vector embeddings will be archived.</div>`;
-            speakVoice("Temporary incognito mode active. Zero conversation history will be archived.");
+            window.open('jarvis_os.html?incognito=true', '_blank');
         }
 
         function loadSession(title) {
             playSFX('switch'); closeAllModals();
             if (!isChatOpen) toggleChatDeck();
             addMsg('user', `Load archive: "${title}"`);
-            runDeepThinkingSequence(`Archive synchronized: ${title}. Parameters active.`, `Archive loaded: ${title}. All historical parameters and quantum checkpoints synchronized.`);
+            processAI(`Archive synchronized: ${title}. Parameters active.`);
         }
 
         function findUKVoice() {
@@ -739,9 +754,18 @@
             }, 500);
         }
 
-        function openSettings() { playSFX('click'); document.getElementById('settings-drawer').style.display = 'flex'; }
-        function closeSettings() { playSFX('click'); document.getElementById('settings-drawer').style.display = 'none'; }
-        function handleBackdropClick(e) { if (e.target.id === 'settings-drawer') closeSettings(); }
+        function openSettings() {
+            playSFX('click');
+            document.getElementById('val-gemini').value = localStorage.getItem('j_key_gemini') || '';
+            document.getElementById('val-claude').value = localStorage.getItem('j_key_claude') || '';
+            document.getElementById('settings-drawer').style.display = 'flex';
+        }
+        function closeSettings() {
+            playSFX('switch');
+            localStorage.setItem('j_key_gemini', document.getElementById('val-gemini').value);
+            localStorage.setItem('j_key_claude', document.getElementById('val-claude').value);
+            document.getElementById('settings-drawer').style.display = 'none';
+        }
 
         function switchMode(m) {
             playSFX('switch'); activeMode = m;
@@ -801,24 +825,30 @@
             const inp = document.getElementById('user-input');
             const text = inp.value.trim(); if (!text) return;
             playSFX('click'); if (!isChatOpen) toggleChatDeck(); addMsg('user', text); inp.value = '';
-            runDeepThinkingSequence(text, getAIAnswer(text));
+            
+            if (text.toLowerCase().includes("blank page") || text.toLowerCase() === "clear chat" || text.toLowerCase() === "new chat") {
+                document.getElementById('chat-modal-deck').innerHTML = '';
+                speakVoice("Chat deck wiped to a blank page.");
+            } else {
+                processAI(text);
+            }
         }
 
         function handleMic() {
             playSFX('click');
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SR) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); return; }
+            if (!SR) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); return; }
             try {
                 const r = new SR();
                 r.onstart = () => document.getElementById('btn-mic').classList.add('listening');
                 r.onresult = (e) => {
                     const tr = e.results[0][0].transcript; if (!isChatOpen) toggleChatDeck(); addMsg('user', tr);
-                    runDeepThinkingSequence(tr, getAIAnswer(tr));
+                    processAI(tr);
                 };
-                r.onerror = () => { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); };
+                r.onerror = () => { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); };
                 r.onend = () => document.getElementById('btn-mic').classList.remove('listening');
                 r.start();
-            } catch(err) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); runDeepThinkingSequence("Status report", "All subsystems nominal at 60 FPS. Ready."); }
+            } catch(err) { if (!isChatOpen) toggleChatDeck(); addMsg('user', `[VOICE SIMULATED] Wake up Jarvis, status report.`); processAI("Wake up Jarvis, status report."); }
         }
 
         function addMsg(sender, text) {
@@ -826,43 +856,52 @@
             d.className = `msg ${sender}`; d.innerText = text; b.appendChild(d); b.scrollTop = b.scrollHeight;
         }
 
-        /* --- 6-STAGE DEEP COGNITIVE TERMINAL STREAM --- */
-        function runDeepThinkingSequence(promptSummary, finalAnswer) {
-            pulseAmp = 45;
-            const b = document.getElementById('chat-modal-deck');
-            const thinkingCard = document.createElement('div');
-            thinkingCard.className = 'msg thinking-block';
-            b.appendChild(thinkingCard);
-            b.scrollTop = b.scrollHeight;
+        /* --- MANDATORY EVERY-TURN AI ROUTING --- */
+        async function processAI(rawInput) {
+            pulseAmp = 40;
+            const q = rawInput.trim();
+            const geminiKey = localStorage.getItem('j_key_gemini');
+            let res = "";
 
-            const steps = [
-                "[SYS] Initializing multi-modal core...",
-                "[MEM] Accessing vector database...",
-                "[NET] Establishing secure latency link...",
-                "[VIS] Parsing spatial awareness layers...",
-                "[INT] Calculating contextual probability...",
-                "[OPT] Optimizing response for terminal output..."
-            ];
+            if (geminiKey && geminiKey.length > 10) {
+                addMsg('jarvis', `[ROUTER] Dispatching prompt to live Gemini matrix...`);
+                res = await fetchLiveGemini(q, geminiKey);
+            } else {
+                res = getAIAnswer(q);
+            }
 
-            let stepIdx = 0;
-            const streamInt = setInterval(() => {
-                if (stepIdx < steps.length) {
-                    thinkingCard.innerHTML += (stepIdx > 0 ? "<br>" : "") + steps[stepIdx];
-                    b.scrollTop = b.scrollHeight;
-                    playSFX('click');
-                    stepIdx++;
-                } else {
-                    clearInterval(streamInt);
-                    setTimeout(() => {
-                        thinkingCard.remove();
-                        addMsg(activeMode === 'killcritic' ? 'killcritic' : 'jarvis', finalAnswer);
-                        speakVoice(finalAnswer);
-                        if (supabaseClient && !isIncognito) {
-                            try { supabaseClient.from('conversation_messages').insert([{ sender_type: activeMode === 'killcritic' ? 'killcritic' : 'jarvis', message_text: finalAnswer }]); } catch(e){}
-                        }
-                    }, 300);
-                }
-            }, 200);
+            if (isChatOpen) addMsg(activeMode === 'killcritic' ? 'killcritic' : 'jarvis', res);
+            speakVoice(res);
+
+            if (supabaseClient && !isIncognito) {
+                try {
+                    await supabaseClient.from('conversation_messages').insert([{
+                        sender_type: activeMode === 'killcritic' ? 'killcritic' : 'jarvis',
+                        message_text: res
+                    }]);
+                } catch(e) {}
+            }
+        }
+
+        async function fetchLiveGemini(prompt, apiKey) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `You are J.A.R.V.I.S., Tony Stark's spatial operating system. Give a crisp, direct, logical, short 1-to-2 sentence response. Prompt: ${prompt}` }] }]
+                    })
+                });
+                clearTimeout(timeoutId);
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text.trim();
+            } catch(e) {
+                clearTimeout(timeoutId);
+                return getAIAnswer(prompt);
+            }
         }
 
         function getAIAnswer(rawInput) {
@@ -967,7 +1006,7 @@
                     let c = tr.replace(/^(wake up jarvis|hey jarvis|jarvis)[\s,\.]*/i, '').trim() || "Status report.";
                     if (!isChatOpen) toggleChatDeck();
                     addMsg('user', `[WAKE-WORD DETECTED] ${c}`);
-                    runDeepThinkingSequence(c, getAIAnswer(c));
+                    processAI(c);
                 }
             };
 
